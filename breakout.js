@@ -420,7 +420,6 @@ function mouseClickHandler(e)
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////HERE IS WHERE THE MAGIC HAPPENS//////////////////
 ////////////////////////////////////////////////////////////////////////////////
-var game = new BreakoutGame("breakoutCanvas");
 function playGame()
 {
     // Check if the ball hit anything this frame, then make it move.
@@ -432,6 +431,7 @@ function playGame()
     game.redraw();
 }
 
+var game = new BreakoutGame("breakoutCanvas");
 document.addEventListener("click", mouseClickHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
 setInterval(playGame, 1000/CONFIG.frameRate);
