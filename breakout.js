@@ -8,6 +8,7 @@ const CONFIG =
     ballColor : "lightblue",
     paddleColor : "yellow",
 //test
+// this is even nicer
     brickRows : 8,
     brickColumns : 7,
     brickSpacing : 5,
