@@ -7,7 +7,7 @@ const CONFIG =
     brickColor : "red",
     ballColor : "lightblue",
     paddleColor : "yellow",
-
+// test in linux
     brickRows : 8,
     brickColumns : 7,
     brickSpacing : 5,
