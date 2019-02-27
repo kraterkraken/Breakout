@@ -7,10 +7,13 @@ const CONFIG =
     brickColor : "red",
     ballColor : "lightblue",
     paddleColor : "yellow",
-// test in linux
+
+    canvasHeight : 700,
+    canvasWidth : 675,
+
     brickRows : 8,
-    brickColumns : 7,
-    brickSpacing : 5,
+    brickColumns : 9,
+    brickSpacing : 0,
     brickWidth : 75,
     brickHeight : 25,
     brickValue : 5,
@@ -67,6 +70,8 @@ class BreakoutGame
     {
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
         this.canvas = document.getElementById(canvasId);
+        this.canvas.width = CONFIG.canvasWidth;
+        this.canvas.height = CONFIG.canvasHeight;
         this.ctx = this.canvas.getContext("2d");
         this.score = 0;
         this.livesLeft = CONFIG.startLives;
@@ -187,11 +192,29 @@ class BreakoutGame
     {
         if (this.ball.y + this.ball.radius >= this.canvas.height)
         {
-            this.livesLeft -=1;
+            // the paddle missed the ball, so we lose a life
+            // and we have to reset the ball on the paddle, ready to launch
+            // by a mouseclick
+
             console.log("you lost a life!");
+
+            this.livesLeft -= 1;
+            this.ball.speed = 0;
+            this.ball.x = this.paddle.x + (this.paddle.width/2);
+            this.ball.y = this.paddle.y - this.ball.radius - 1;
+            this.ball.diredction = CONFIG.initialBallDirection;
+            this.running = false;
+
+            document.addEventListener("click", mouseClickHandler);
+
+            // TODO: add some sort of animation or on-screen msg that
+            // we lose a life
+
             if (this.livesLeft == 0)
             {
                 console.log("game over, man!  game over!");
+                // TODO: add some sort of animation or on-screen GAME OVER msg.
+                // Also allow player to restart game.
             }
         }
 
