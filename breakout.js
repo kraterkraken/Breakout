@@ -8,7 +8,8 @@ const CONFIG =
     ballColor : "lightblue",
     paddleColor : "yellow",
 
-    emptyRegionHeight : 100,
+    statusBarHeight : 100,
+    statusBarColor : "#555555",
 
     canvasHeight : 750,
     canvasWidth : "dynamic", // "dynamic" or an integer representing the width in pixels
@@ -20,6 +21,7 @@ const CONFIG =
     brickWidth : 75,
     brickHeight : 25,
     brickValues : [15, 13, 11, 9, 7, 5, 3, 1], // array of values for each row of bricks, from top to bottom
+    brickYOffset : 100, // this tells how much space is between the top wall and the bricks
 
     ballRadius : 5,
     initialBallSpeed : 300, // pixels per second
@@ -72,7 +74,14 @@ class BreakoutGame
     constructor(canvasId)
     {
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
+        this.running = false;
+
         this.canvas = document.getElementById(canvasId);
+
+        if (CONFIG.brickValues.length != CONFIG.brickRows)
+        {
+            alert("ERROR: number of brick rows does not match number of brick values.")
+        }
 
         if (CONFIG.canvasWidth == "dynamic")
         {
@@ -86,11 +95,9 @@ class BreakoutGame
 
         this.canvas.height = CONFIG.canvasHeight;
         this.ctx = this.canvas.getContext("2d");
-        this.score = 0;
-        this.livesLeft = CONFIG.startLives;
-        this.running = false;
 
         // set up all the entities that the game needs to keep track of
+        this.statusBar = new StatusBar(CONFIG.statusBarColor, 0, 0, this.canvas.width, 100, CONFIG.startLives);
         this.ball = new Ball(CONFIG.ballColor, this.canvas.width/2, CONFIG.paddleY-CONFIG.ballRadius-1, CONFIG.ballRadius);
         this.paddle = new Paddle(CONFIG.paddleColor, (this.canvas.width - CONFIG.paddleWidth)/2, CONFIG.paddleY, CONFIG.paddleWidth, CONFIG.paddleHeight);
         this.bricks = [];
@@ -98,8 +105,9 @@ class BreakoutGame
 
         this.entities.push(this.ball);
         this.entities.push(this.paddle);
+        this.entities.push(this.statusBar);
 
-        for (let i=0, hue=0, y=CONFIG.emptyRegionHeight; i<CONFIG.brickRows; i++)
+        for (let i=0, hue=0, y=CONFIG.brickYOffset; i<CONFIG.brickRows; i++)
         {
 
             let color = CONFIG.brickColor;
@@ -176,8 +184,8 @@ class BreakoutGame
             if (this.ball.checkCollisionWith(this.bricks[i]))
             {
                 this.bricks[i].exists = false;
-                this.score += this.bricks[i].value;
-                console.log("SCORE! +" + this.bricks[i].value + ". New score is " + this.score);
+                this.statusBar.score += this.bricks[i].value;
+                console.log("SCORE! +" + this.bricks[i].value + ". New score is " + this.statusBar.score);
                 return; // only allow collision with one brick
             }
         }
@@ -221,7 +229,7 @@ class BreakoutGame
 
             console.log("you lost a life!");
 
-            this.livesLeft -= 1;
+            this.statusBar.livesLeft--;
             this.ball.speed = 0;
             this.ball.x = this.paddle.x + (this.paddle.width/2);
             this.ball.y = this.paddle.y - this.ball.radius - 1;
@@ -233,7 +241,7 @@ class BreakoutGame
             // TODO: add some sort of animation or on-screen msg that
             // we lose a life
 
-            if (this.livesLeft == 0)
+            if (this.statusBar.livesLeft == 0)
             {
                 console.log("game over, man!  game over!");
                 // TODO: add some sort of animation or on-screen GAME OVER msg.
@@ -282,6 +290,46 @@ class GameEntity
 
 }
 
+// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+class StatusBar extends GameEntity
+{
+    // ---------------------------------------------------------------------
+    constructor(color, x, y, width, height, startLives)
+    {
+        super(color, x, y, 0, 0);
+        this. height = height;
+        this.width = width;
+        this.score = 0;
+        this.livesLeft = startLives;
+    }
+
+    // ---------------------------------------------------------------------
+    draw(ctx)
+    {
+        EZArt.drawBox(ctx, this.color, this.x, this.y, this.width, this.height);
+        // TODO: figure out how to display text
+        ctx.font = "20px Verdana";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = "white";
+        ctx.fillText("Score", this.x + 10, this.y + 10);
+        ctx.fillText("Lives", this.width - 75, this.y + 10);
+        ctx.font = "60px Verdana";
+        ctx.fillText(this.score, this.x + 10, this.y + 30);
+        ctx.fillText(this.livesLeft, this.width - 75, this.y + 30);
+
+        // if (ctx.measureText)
+        // {
+        //     while(ctx.measureText("Tutorials Park").width > 240)
+        //     {
+        //         fontSize--;
+        //         ctx.font = fontSize + "px Verdana";
+        //     }
+        //
+        //     ctx.fillText("Text size is  " + fontSize + "px", 0, 0);
+        // }
+    }
+}
 // ---------------------------------------------------------------------
 // ---------------------------------------------------------------------
 class Ball extends GameEntity
