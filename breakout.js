@@ -4,19 +4,22 @@
 const CONFIG =
 {
     startLives : 3,
-    brickColor : "red",
+    brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
     paddleColor : "yellow",
 
-    canvasHeight : 700,
-    canvasWidth : 675,
+    emptyRegionHeight : 100,
+
+    canvasHeight : 750,
+    canvasWidth : "dynamic", // "dynamic" or an integer representing the width in pixels
+                        // "dynamic" width is based on the size and spacing of the bricks
 
     brickRows : 8,
-    brickColumns : 9,
-    brickSpacing : 0,
+    brickColumns : 10,
+    brickSpacing : 2,
     brickWidth : 75,
     brickHeight : 25,
-    brickValue : 5,
+    brickValues : [15, 13, 11, 9, 7, 5, 3, 1], // array of values for each row of bricks, from top to bottom
 
     ballRadius : 5,
     initialBallSpeed : 300, // pixels per second
@@ -24,7 +27,7 @@ const CONFIG =
 
     paddleWidth : 60,
     paddleHeight : 10,
-    paddleY : 600,
+    paddleY : 700,
 
     frameRate : 60 // frames per second
 }
@@ -70,7 +73,17 @@ class BreakoutGame
     {
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
         this.canvas = document.getElementById(canvasId);
-        this.canvas.width = CONFIG.canvasWidth;
+
+        if (CONFIG.canvasWidth == "dynamic")
+        {
+            this.canvas.width = CONFIG.brickWidth * CONFIG.brickColumns;
+            this.canvas.width += CONFIG.brickSpacing * (CONFIG.brickColumns + 1)
+        }
+        else if (typeof CONFIG.canvasWidth == "number")
+        {
+            this.canvas.width = CONFIG.canvasWidth;
+        }
+
         this.canvas.height = CONFIG.canvasHeight;
         this.ctx = this.canvas.getContext("2d");
         this.score = 0;
@@ -86,18 +99,27 @@ class BreakoutGame
         this.entities.push(this.ball);
         this.entities.push(this.paddle);
 
-        for (let i=0, y=0; i<CONFIG.brickRows; i++)
+        for (let i=0, hue=0, y=CONFIG.emptyRegionHeight; i<CONFIG.brickRows; i++)
         {
+
+            let color = CONFIG.brickColor;
+            if (color == "rainbow")
+            {
+                color = "hsl(" + hue + ", 100%, 50%)";
+                console.log(color);
+            }
+
             y += CONFIG.brickSpacing;
             for (let j=0, x=0; j<CONFIG.brickColumns; j++)
             {
                 x += CONFIG.brickSpacing;
-                let newBrick = new Brick(CONFIG.brickColor, x, y, CONFIG.brickWidth, CONFIG.brickHeight, CONFIG.brickValue);
+                let newBrick = new Brick(color, x, y, CONFIG.brickWidth, CONFIG.brickHeight, CONFIG.brickValues[i]);
                 this.entities.push(newBrick);
                 this.bricks.push(newBrick);
                 x += CONFIG.brickWidth;
             }
             y += CONFIG.brickHeight;
+            hue += 275 / CONFIG.brickRows;
         }
 
         // one easy line to draw everything
@@ -155,6 +177,7 @@ class BreakoutGame
             {
                 this.bricks[i].exists = false;
                 this.score += this.bricks[i].value;
+                console.log("SCORE! +" + this.bricks[i].value + ". New score is " + this.score);
                 return; // only allow collision with one brick
             }
         }
