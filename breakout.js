@@ -8,7 +8,7 @@ const CONFIG =
     ballColor : "lightblue",
     paddleColor : "yellow",
 
-    statusBarHeight : 100,
+    statusBarHeight : 100, // note:  the top wall of the game "arena" is at y=statusBarHeight
     statusBarColor : "#555555",
 
     canvasHeight : 750,
@@ -107,7 +107,7 @@ class BreakoutGame
         this.entities.push(this.paddle);
         this.entities.push(this.statusBar);
 
-        for (let i=0, hue=0, y=CONFIG.brickYOffset; i<CONFIG.brickRows; i++)
+        for (let i=0, hue=0, y=this.statusBar.height + CONFIG.brickYOffset; i<CONFIG.brickRows; i++)
         {
 
             let color = CONFIG.brickColor;
@@ -148,7 +148,7 @@ class BreakoutGame
             this.ball.x = (this.ball.right > this.canvas.width)? this.canvas.width - this.ball.radius : this.ball.x;
             this.ball.x = (this.ball.left < 0)? this.ball.radius : this.ball.x;
         }
-        else if (this.ball.top <= 0)
+        else if (this.ball.top <= this.statusBar.height)
         {
             // we hit the ceiling: rebound
             this.ball.direction = -this.ball.direction;
