@@ -273,7 +273,7 @@ class BreakoutGame
                 let y = this.canvas.height/2 - 100;
                 EZArt.drawBox(this.ctx, "red", x, y, this.canvas.width/2, 100);
                 EZArt.drawText(this.ctx, "GAME OVER", "60px Verdana", "white", x+15, y+10);
-                EZArt.drawText(this.ctx, "Press a key to start over.", "20px Verdana", "white", x+100, y+70);
+                EZArt.drawText(this.ctx, "Press a key to play again.", "20px Verdana", "white", x+100, y+70);
                 document.addEventListener("keypress", keyPressHandler);
                 console.log("game over, man!  game over!");
             }
