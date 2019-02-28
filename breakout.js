@@ -8,7 +8,10 @@ const CONFIG =
     ballColor : "lightblue",
     paddleColor : "yellow",
 
-    statusBarHeight : 100, // note:  the top wall of the game "arena" is at y=statusBarHeight
+    statusBarHeight : 100, // NOTE:  the top wall of the game "arena" is at y=statusBarHeight
+                            // IMPORTANT: changing the statusBarHeight from 100 will have unexpected
+                            // results, since the text in there is a fixed font size, and won't scale
+
     statusBarColor : "#555555",
 
     canvasHeight : 750,
@@ -263,14 +266,20 @@ class BreakoutGame
             if (this.statusBar.livesLeft == 0)
             {
                 // game over
-                console.log("game over, man!  game over!");
-                alert("Game over man!  After dismissing this dialog, press a key to restart.");
                 this.gameOver = true;
+                this.redraw();  // we redraw here to make sure the status bar is updated on screen
+
+                let x = (this.canvas.width/2) - (this.canvas.width/4);
+                let y = this.canvas.height/2 - 100;
+                EZArt.drawBox(this.ctx, "red", x, y, this.canvas.width/2, 100);
+                EZArt.drawText(this.ctx, "GAME OVER", "60px Verdana", "white", x+15, y+10);
+                EZArt.drawText(this.ctx, "Press a key to start over.", "20px Verdana", "white", x+100, y+70);
                 document.addEventListener("keypress", keyPressHandler);
+                console.log("game over, man!  game over!");
             }
             else
             {
-                // get ready to launch by a mouseclick
+                // get ready to relaunch by a mouseclick
                 document.addEventListener("click", mouseClickHandler);
             }
         }
@@ -537,11 +546,17 @@ function playGame()
 {
     // Check if the ball hit anything this frame, then make it move.
     // After that, see if any lives were lost.  Finally, draw this frame.
-    game.handleWallCollisions();
-    game.handleEntityCollisions(); // ISSUE: is there a problem if the ball hits the wall and the paddle at the same time?
-    game.moveBall();
-    game.checkLives();
-    game.redraw();
+    if (!game.gameOver)
+    {
+        game.handleWallCollisions();
+        game.handleEntityCollisions(); // ISSUE: is there a problem if the ball hits the wall and the paddle at the same time?
+        game.moveBall();
+        game.checkLives();
+        if (!game.gameOver)
+        {
+            game.redraw();
+        }
+    }
 }
 
 var game = new BreakoutGame("breakoutCanvas");
