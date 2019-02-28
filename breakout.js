@@ -554,7 +554,7 @@ function playGame()
         game.checkLives();
         if (!game.gameOver)
         {
-            game.redraw();
+            game.redraw();  // redrawing when the game is over will erase the game over msg, thus the if-stmt here
         }
     }
 }
