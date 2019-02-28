@@ -3,7 +3,7 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
-    startLives : 3,
+    startLives : 1,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
     paddleColor : "yellow",
@@ -17,6 +17,8 @@ const CONFIG =
     canvasHeight : 750,
     canvasWidth : "dynamic", // "dynamic" or an integer representing the width in pixels
                         // "dynamic" width is based on the size and spacing of the bricks
+
+    font : "Courier New",
 
     brickRows : 8,
     brickColumns : 10,
@@ -75,6 +77,7 @@ class EZArt
         ctx.fillStyle = color;
         ctx.fillText(text, x, y);
     }
+
 }
 
 // ---------------------------------------------------------------------
@@ -196,6 +199,49 @@ class BreakoutGame
     }
 
     // ---------------------------------------------------------------------
+    gameOverMsg()
+    {
+        // wow this is ugly
+        let x = this.canvas.width/2;
+        let y = this.canvas.height/2 - 100;
+        let margin = 20;
+        let vertSpace = 5;
+
+        let msg1 = "GAME OVER";
+        let height1 = 60;
+        this.ctx.font = height1 + "px " + CONFIG.font;
+        let width1 = this.ctx.measureText(msg1).width;
+
+        let msg2 = "Press a key to play again.";
+        let height2 = 20;
+        this.ctx.font = height2 + "px " + CONFIG.font;
+        let width2 = this.ctx.measureText(msg2).width;
+
+        let width = Math.max(width1, width2) + margin*2;
+        let height = height1 + height2 + vertSpace + margin*2;
+
+        this.ctx.shadowBlur = 20;
+        this.ctx.shadowColor = "black";
+        this.ctx.shadowOffsetX = 5;
+        this.ctx.shadowOffsetY = 5;
+        EZArt.drawBox(this.ctx, "red", x - (width/2), y - margin, width, height);
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+
+        this.ctx.textBaseline = "top";
+        this.ctx.textAlign = "center";
+        this.ctx.fillStyle = "white";
+
+        this.ctx.font = height1 + "px " + CONFIG.font;
+        this.ctx.fillText(msg1, x, y);
+
+        this.ctx.font = height2 + "px " + CONFIG.font;
+        this.ctx.fillText(msg2, x, y + height1 + vertSpace);
+
+    }
+
+    // ---------------------------------------------------------------------
     handleEntityCollisions()
     {
         if (this.ball.checkCollisionWith(this.paddle))
@@ -268,12 +314,8 @@ class BreakoutGame
                 // game over
                 this.gameOver = true;
                 this.redraw();  // we redraw here to make sure the status bar is updated on screen
+                this.gameOverMsg();
 
-                let x = (this.canvas.width/2) - (this.canvas.width/4);
-                let y = this.canvas.height/2 - 100;
-                EZArt.drawBox(this.ctx, "red", x, y, this.canvas.width/2, 100);
-                EZArt.drawText(this.ctx, "GAME OVER", "60px Verdana", "white", x+15, y+10);
-                EZArt.drawText(this.ctx, "Press a key to play again.", "20px Verdana", "white", x+100, y+70);
                 document.addEventListener("keypress", keyPressHandler);
                 console.log("game over, man!  game over!");
             }
@@ -344,11 +386,11 @@ class StatusBar extends GameEntity
     {
         EZArt.drawBox(ctx, this.color, this.x, this.y, this.width, this.height);
 
-        EZArt.drawText(ctx, "Score", "20px Verdana", "white", this.x+10, this.y+10);
-        EZArt.drawText(ctx, this.score, "60px Verdana", "white", this.x+10, this.y+30);
+        EZArt.drawText(ctx, "Score", "20px "+CONFIG.font, "white", this.x+10, this.y+10);
+        EZArt.drawText(ctx, this.score, "60px "+CONFIG.font, "white", this.x+10, this.y+30);
 
-        EZArt.drawText(ctx, "Lives", "20px Verdana", "white", this.width-75, this.y+10);
-        EZArt.drawText(ctx, this.livesLeft, "60px Verdana", "white", this.width-75, this.y+30);
+        EZArt.drawText(ctx, "Lives", "20px "+CONFIG.font, "white", this.width-75, this.y+10);
+        EZArt.drawText(ctx, this.livesLeft, "60px "+CONFIG.font, "white", this.width-75, this.y+30);
 
     }
 }
