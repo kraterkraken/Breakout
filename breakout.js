@@ -199,7 +199,7 @@ class BreakoutGame
     }
 
     // ---------------------------------------------------------------------
-    gameOverMsg()
+    gameOverMsg(msg1, msg2)
     {
         // wow this is ugly
         let x = this.canvas.width/2;
@@ -207,12 +207,10 @@ class BreakoutGame
         let margin = 20;
         let vertSpace = 5;
 
-        let msg1 = "GAME OVER";
         let height1 = 60;
         this.ctx.font = height1 + "px " + CONFIG.font;
         let width1 = this.ctx.measureText(msg1).width;
 
-        let msg2 = "Press a key to play again.";
         let height2 = 20;
         this.ctx.font = height2 + "px " + CONFIG.font;
         let width2 = this.ctx.measureText(msg2).width;
@@ -316,7 +314,7 @@ class BreakoutGame
                 // game over
                 this.gameOver = true;
                 this.redraw();  // we redraw here to make sure the status bar is updated on screen
-                this.gameOverMsg();
+                this.gameOverMsg("GAME OVER", "Press a key to play again.");
 
                 document.addEventListener("keypress", keyPressHandler);
                 console.log("game over, man!  game over!");
