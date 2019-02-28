@@ -64,6 +64,14 @@ class EZArt
         ctx.strokeStyle = color;
         ctx.stroke();
     }
+
+    static drawText(ctx, text, font, color, x, y)
+    {
+        ctx.textBaseline = "top";
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.fillText(text, x, y);
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -75,6 +83,7 @@ class BreakoutGame
     {
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
         this.running = false;
+        this.gameOver = false;
 
         this.canvas = document.getElementById(canvasId);
 
@@ -132,6 +141,25 @@ class BreakoutGame
 
         // one easy line to draw everything
         this.draw();
+    }
+
+    reset()
+    {
+        this.running = false;
+        this.gameOver = false;
+        this.statusBar.score = 0;
+        this.statusBar.livesLeft = CONFIG.startLives;
+        this.ball.speed = 0;
+        this.ball.direction = CONFIG.initialBallDirection;
+
+        for (let i=0; i<this.bricks.length; i++)
+        {
+            this.bricks[i].exists = true;
+        }
+
+        document.addEventListener("click", mouseClickHandler);
+        this.redraw();
+
     }
 
     // ---------------------------------------------------------------------
@@ -223,29 +251,27 @@ class BreakoutGame
     {
         if (this.ball.y + this.ball.radius >= this.canvas.height)
         {
-            // the paddle missed the ball, so we lose a life
-            // and we have to reset the ball on the paddle, ready to launch
-            // by a mouseclick
-
-            console.log("you lost a life!");
-
+            // the paddle missed the ball, so we lose a life, reset the ball on the paddle
             this.statusBar.livesLeft--;
             this.ball.speed = 0;
             this.ball.x = this.paddle.x + (this.paddle.width/2);
             this.ball.y = this.paddle.y - this.ball.radius - 1;
             this.ball.diredction = CONFIG.initialBallDirection;
             this.running = false;
-
-            document.addEventListener("click", mouseClickHandler);
-
-            // TODO: add some sort of animation or on-screen msg that
-            // we lose a life
+            console.log("you lost a life!");
 
             if (this.statusBar.livesLeft == 0)
             {
+                // game over
                 console.log("game over, man!  game over!");
-                // TODO: add some sort of animation or on-screen GAME OVER msg.
-                // Also allow player to restart game.
+                alert("Game over man!  After dismissing this dialog, press a key to restart.");
+                this.gameOver = true;
+                document.addEventListener("keypress", keyPressHandler);
+            }
+            else
+            {
+                // get ready to launch by a mouseclick
+                document.addEventListener("click", mouseClickHandler);
             }
         }
 
@@ -308,26 +334,13 @@ class StatusBar extends GameEntity
     draw(ctx)
     {
         EZArt.drawBox(ctx, this.color, this.x, this.y, this.width, this.height);
-        // TODO: figure out how to display text
-        ctx.font = "20px Verdana";
-        ctx.textBaseline = "top";
-        ctx.fillStyle = "white";
-        ctx.fillText("Score", this.x + 10, this.y + 10);
-        ctx.fillText("Lives", this.width - 75, this.y + 10);
-        ctx.font = "60px Verdana";
-        ctx.fillText(this.score, this.x + 10, this.y + 30);
-        ctx.fillText(this.livesLeft, this.width - 75, this.y + 30);
 
-        // if (ctx.measureText)
-        // {
-        //     while(ctx.measureText("Tutorials Park").width > 240)
-        //     {
-        //         fontSize--;
-        //         ctx.font = fontSize + "px Verdana";
-        //     }
-        //
-        //     ctx.fillText("Text size is  " + fontSize + "px", 0, 0);
-        // }
+        EZArt.drawText(ctx, "Score", "20px Verdana", "white", this.x+10, this.y+10);
+        EZArt.drawText(ctx, this.score, "60px Verdana", "white", this.x+10, this.y+30);
+
+        EZArt.drawText(ctx, "Lives", "20px Verdana", "white", this.width-75, this.y+10);
+        EZArt.drawText(ctx, this.livesLeft, "60px Verdana", "white", this.width-75, this.y+30);
+
     }
 }
 // ---------------------------------------------------------------------
@@ -509,6 +522,12 @@ function mouseClickHandler(e)
     // once we launch, we will never do it again, so remove the listener
     document.removeEventListener("click", mouseClickHandler);
 
+}
+
+function keyPressHandler(e)
+{
+    game.reset();
+    document.removeEventListener("keypress", keyPressHandler);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
