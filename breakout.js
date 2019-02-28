@@ -239,6 +239,8 @@ class BreakoutGame
         this.ctx.font = height2 + "px " + CONFIG.font;
         this.ctx.fillText(msg2, x, y + height1 + vertSpace);
 
+        this.ctx.textAlign = "left";
+
     }
 
     // ---------------------------------------------------------------------
