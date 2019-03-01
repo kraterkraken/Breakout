@@ -3,7 +3,7 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
-    startLives : 1,
+    startLives : 3,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
     paddleColor : "yellow",
@@ -586,18 +586,16 @@ function keyPressHandler(e)
 ////////////////////////////////////////////////////////////////////////////////
 function playGame()
 {
-    // Check if the ball hit anything this frame, then make it move.
-    // After that, see if any lives were lost.  Finally, draw this frame.
+    // Check how many lives are left, and make sure the game isn't over.
+    // If it isn't, see if the ball hit anything this frame, then make it move,
+    // and draw this frame.
+    game.checkLives();
     if (!game.gameOver)
     {
         game.handleWallCollisions();
         game.handleEntityCollisions(); // ISSUE: is there a problem if the ball hits the wall and the paddle at the same time?
         game.moveBall();
-        game.checkLives();
-        if (!game.gameOver)
-        {
-            game.redraw();  // redrawing when the game is over will erase the game over msg, thus the if-stmt here
-        }
+        game.redraw();
     }
 }
 
