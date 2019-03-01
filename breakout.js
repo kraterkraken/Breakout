@@ -157,6 +157,7 @@ class BreakoutGame
         this.statusBar.livesLeft = CONFIG.startLives;
         this.ball.speed = 0;
         this.ball.direction = CONFIG.initialBallDirection;
+        this.paddle.width = CONFIG.paddlewidth;
 
         for (let i=0; i<this.bricks.length; i++)
         {
@@ -184,8 +185,9 @@ class BreakoutGame
         }
         else if (this.ball.top <= this.statusBar.height)
         {
-            // we hit the ceiling: rebound
+            // we hit the ceiling: change paddle size and rebound
             this.ball.direction = -this.ball.direction;
+            this.paddle.width = CONFIG.paddleWidth/2;
 
             // adjust the position of the ball if a part of the ball is currently clipped by the ceiling
             // (this prevents some really weird rebound bugs where the ball just glides along the surface for a while)
