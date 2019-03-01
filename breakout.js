@@ -567,6 +567,7 @@ function mouseMoveHandler(e)
     }
 }
 
+// -------------------------------------------------------------------------
 function mouseClickHandler(e)
 {
     if (game.gameOver)
@@ -586,6 +587,7 @@ function mouseClickHandler(e)
 
 }
 
+// -------------------------------------------------------------------------
 function keyPressHandler(e)
 {
     game.reset();
