@@ -3,7 +3,7 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
-    startLives : 3,
+    startLives : 1,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
     paddleColor : "yellow",
@@ -298,6 +298,11 @@ class BreakoutGame
     // ---------------------------------------------------------------------
     checkLives()
     {
+        if (this.gameOver)
+        {
+            return;  // no point doing all this if the game is already over
+        }
+
         if (this.ball.y + this.ball.radius >= this.canvas.height)
         {
             // the paddle missed the ball, so we lose a life, reset the ball on the paddle
@@ -317,6 +322,7 @@ class BreakoutGame
                 this.gameOverMsg("GAME OVER", "Press a key to play again.");
 
                 document.addEventListener("keypress", keyPressHandler);
+                document.addEventListener("click", mouseClickHandler);
                 console.log("game over, man!  game over!");
             }
             else
@@ -563,6 +569,11 @@ function mouseMoveHandler(e)
 
 function mouseClickHandler(e)
 {
+    if (game.gameOver)
+    {
+        game.gameOverMsg("GAME OVER", "I said 'PRESS A KEY' not 'CLICK THE MOUSE'.  Sheesh!");
+        return;
+    }
     // the game starts when we click the mouse button
     game.running = true;
 
