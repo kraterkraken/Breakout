@@ -89,7 +89,7 @@ class BreakoutGame
     {
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
         this.running = false;
-        this.gameOver = false;
+        this.isOver = false;
 
         this.canvas = document.getElementById(canvasId);
 
@@ -152,7 +152,7 @@ class BreakoutGame
     reset()
     {
         this.running = false;
-        this.gameOver = false;
+        this.isOver = false;
         this.statusBar.score = 0;
         this.statusBar.livesLeft = CONFIG.startLives;
         this.ball.speed = 0;
@@ -199,7 +199,7 @@ class BreakoutGame
     }
 
     // ---------------------------------------------------------------------
-    gameOverMsg(msg1, msg2)
+    msgBox2Line(msg1, msg2)
     {
         // wow this is ugly
         let x = this.canvas.width/2;
@@ -298,7 +298,7 @@ class BreakoutGame
     // ---------------------------------------------------------------------
     checkLives()
     {
-        if (this.gameOver)
+        if (this.isOver)
         {
             return;  // no point doing all this if the game is already over
         }
@@ -317,9 +317,9 @@ class BreakoutGame
             if (this.statusBar.livesLeft == 0)
             {
                 // game over
-                this.gameOver = true;
+                this.isOver = true;
                 this.redraw();  // we redraw here to make sure the status bar is updated on screen
-                this.gameOverMsg("GAME OVER", "Press a key to play again.");
+                this.msgBox2Line("GAME OVER", "Press a key to play again.");
 
                 document.addEventListener("keypress", keyPressHandler);
                 document.addEventListener("click", mouseClickHandler);
@@ -570,9 +570,9 @@ function mouseMoveHandler(e)
 // -------------------------------------------------------------------------
 function mouseClickHandler(e)
 {
-    if (game.gameOver)
+    if (game.isOver)
     {
-        game.gameOverMsg("GAME OVER", "I said 'PRESS A KEY' not 'CLICK THE MOUSE'.  Sheesh!");
+        game.msgBox2Line("GAME OVER", "I said 'PRESS A KEY' not 'CLICK THE MOUSE'.  Sheesh!");
         return;
     }
     // the game starts when we click the mouse button
@@ -603,7 +603,7 @@ function playGame()
     // If it isn't, see if the ball hit anything this frame, then make it move,
     // and draw this frame.
     game.checkLives();
-    if (!game.gameOver)
+    if (!game.isOver)
     {
         game.handleWallCollisions();
         game.handleEntityCollisions(); // ISSUE: is there a problem if the ball hits the wall and the paddle at the same time?
