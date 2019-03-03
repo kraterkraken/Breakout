@@ -41,12 +41,15 @@ const CONFIG =
 
 // --------------------------------------------------------------------
 // this is just for testing so I can figure out what is going on with angles
-function normalizeAngle(radians)
+function logAngle(radians)
 {
-    let newAngle = radians;
-    while (newAngle <= -Math.PI) newAngle += 2*Math.PI;
-    while (newAngle > Math.PI) newAngle -= 2*Math.PI;
-    return newAngle;
+    // normalize the angle
+    let norm = Math.atan2(Math.sin(radians), Math.cos(radians))
+
+    // convert to degrees before logging
+    let degrees = 180 * norm/Math.PI;
+
+    console.log("ball direction = " + degrees);
 }
 
 // ---------------------------------------------------------------------
@@ -157,7 +160,7 @@ class BreakoutGame
         this.statusBar.livesLeft = CONFIG.startLives;
         this.ball.speed = 0;
         this.ball.direction = CONFIG.initialBallDirection;
-        this.paddle.width = CONFIG.paddlewidth;
+        this.paddle.width = CONFIG.paddleWidth;
 
         for (let i=0; i<this.bricks.length; i++)
         {
@@ -252,20 +255,21 @@ class BreakoutGame
             {
                 // what percentage are we from the center to the edge
                 let mid = this.paddle.x + (this.paddle.width/2)
-                let percent = (this.ball.y - mid) / mid;
-                //change direction a max of 0.2 radians (about 11 degrees)
-                //this.ball.direction += percent * 0.2;
+                let percent = (this.ball.x - mid) / (this.paddle.width/2);
+                this.ball.adjustImpactAngle(percent);
             }
         }
-
-        for(let i=0; i<this.bricks.length; i++)
+        else
         {
-            if (this.ball.checkCollisionWith(this.bricks[i]))
+            for(let i=0; i<this.bricks.length; i++)
             {
-                this.bricks[i].exists = false;
-                this.statusBar.score += this.bricks[i].value;
-                console.log("SCORE! +" + this.bricks[i].value + ". New score is " + this.statusBar.score);
-                return; // only allow collision with one brick
+                if (this.ball.checkCollisionWith(this.bricks[i]))
+                {
+                    this.bricks[i].exists = false;
+                    this.statusBar.score += this.bricks[i].value;
+                    console.log("SCORE! +" + this.bricks[i].value + ". New score is " + this.statusBar.score);
+                    return; // only allow collision with one brick
+                }
             }
         }
     }
@@ -425,6 +429,18 @@ class Ball extends GameEntity
     }
 
     // ---------------------------------------------------------------------
+    adjustImpactAngle(percent)
+    {
+        let maxDegrees = 10;  // degrees
+        let maxRadians = Math.PI * (maxDegrees / 180); // radians ... I did this because it is easier to think in degrees
+
+        // general case
+        logAngle(this.direction);
+        this.direction += (percent*maxRadians);
+        logAngle(this.direction);
+        console.log("====");
+    }
+    // ---------------------------------------------------------------------
     checkCollisionWith(that)
     {
 
@@ -466,12 +482,12 @@ class Ball extends GameEntity
                 if (Math.abs(m) < Math.abs(n))
                 {
                     // we hit from the top
-                    this.y = that.top - this.radius;
+                    this.y = that.top - this.radius - 1;
                 }
                 else
                 {
                     // we hit from the bottom
-                    this.y = that.bottom + this.radius;
+                    this.y = that.bottom + this.radius  + 1;
                 }
             }
             else if (that.top <= this.y && this.y <= that.bottom) // else if we hit the left or right
@@ -483,12 +499,12 @@ class Ball extends GameEntity
                 if (Math.abs(i) < Math.abs(j))
                 {
                     // we hit from the left
-                    this.x = that.left - this.radius;
+                    this.x = that.left - this.radius - 1;
                 }
                 else
                 {
                     // we hit from the right
-                    this.x = that.right + this.radius;
+                    this.x = that.right + this.radius + 1;
                 }
             }
             else
