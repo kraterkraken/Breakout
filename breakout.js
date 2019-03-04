@@ -3,6 +3,7 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
+    debug_neverMiss : false, // paddle never misses when true!
     startLives : 1,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
@@ -25,7 +26,8 @@ const CONFIG =
     brickSpacing : 2,
     brickWidth : 75,
     brickHeight : 25,
-    brickValues : [15, 13, 11, 9, 7, 5, 3, 1], // array of values for each row of bricks, from top to bottom
+    brickValues : [15, 13, 11, 9, 7, 5, 3, 1], // array of score values for each row of bricks, from top to bottom
+    brickRowAccelerations : [50, 50, 0, 50, 0, 50, 0, 0], // tells how much each row will accelerate the ball when hit (px/sec) from top to bottom
     brickYOffset : 100, // this tells how much space is between the top wall and the bricks
 
     ballRadius : 5,
@@ -93,18 +95,28 @@ class BreakoutGame
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
         this.running = false;
         this.isOver = false;
+        this.wasRowHit = new Array(CONFIG.brickRows);
+        for (let i=0; i<this.wasRowHit.length; i++)
+        {
+            this.wasRowHit[i] = false;
+        }
 
         this.canvas = document.getElementById(canvasId);
 
         if (CONFIG.brickValues.length != CONFIG.brickRows)
         {
-            alert("ERROR: number of brick rows does not match number of brick values.")
+            alert("ERROR: number of brick rows does not match number of brick values.");
+        }
+
+        if (CONFIG.brickRowAccelerations.length != CONFIG.brickRows)
+        {
+            alert("ERROR: number of brick rows does not match number of brick row accelerations.");
         }
 
         if (CONFIG.canvasWidth == "dynamic")
         {
             this.canvas.width = CONFIG.brickWidth * CONFIG.brickColumns;
-            this.canvas.width += CONFIG.brickSpacing * (CONFIG.brickColumns + 1)
+            this.canvas.width += CONFIG.brickSpacing * (CONFIG.brickColumns + 1);
         }
         else if (typeof CONFIG.canvasWidth == "number")
         {
@@ -267,6 +279,15 @@ class BreakoutGame
                 {
                     this.bricks[i].exists = false;
                     this.statusBar.score += this.bricks[i].value;
+                    // handle ball accelerations
+                    let row = Math.floor(i / CONFIG.brickColumns); // what row are we in?
+
+                    if (!this.wasRowHit[row])
+                    {
+                        this.wasRowHit[row] = true;
+                        this.ball.speed += CONFIG.brickRowAccelerations[row];
+                    }
+
                     console.log("SCORE! +" + this.bricks[i].value + ". New score is " + this.statusBar.score);
                     return; // only allow collision with one brick
                 }
@@ -299,6 +320,12 @@ class BreakoutGame
         let yIncrement = s * Math.sin(this.ball.direction);
         this.ball.x += xIncrement;
         this.ball.y += yIncrement;
+
+        if (CONFIG.debug_neverMiss)
+        {
+            this.paddle.x = this.ball.x - (this.paddle.width/2);
+        }
+
     }
 
     // ---------------------------------------------------------------------
@@ -561,27 +588,31 @@ class Paddle extends Brick
 // -------------------------------------------------------------------------
 function mouseMoveHandler(e)
 {
-    // the middle of the paddle follows the mouse pointer
-    game.paddle.x = e.clientX - game.paddle.width/2;
-    //for some reason, the above line puts the paddle about 10px too far right, so adjust
-    game.paddle.x -= 10;
 
-    // don't go past the walls
-    if (game.paddle.left < 0)
+    if (!CONFIG.debug_neverMiss)
     {
-        game.paddle.x = 0;
-    }
-    if (game.paddle.right > game.canvas.width)
-    {
-        game.paddle.x = game.canvas.width - game.paddle.width;
-    }
+        // the middle of the paddle follows the mouse pointer
+        game.paddle.x = e.clientX - game.paddle.width/2;
+        //for some reason, the above line puts the paddle about 10px too far right, so adjust
+        game.paddle.x -= 10;
 
-    // if the game hasn't begun, the ball should follow the paddle
-    if (!game.running)
-    {
-        game.ball.x = e.clientX;
-        //for some reason, the above line puts the ball about 10px too far right, so adjust
-        game.ball.x -= 10;
+        // don't go past the walls
+        if (game.paddle.left < 0)
+        {
+            game.paddle.x = 0;
+        }
+        if (game.paddle.right > game.canvas.width)
+        {
+            game.paddle.x = game.canvas.width - game.paddle.width;
+        }
+
+        // if the game hasn't begun, the ball should follow the paddle
+        if (!game.running)
+        {
+            game.ball.x = e.clientX;
+            //for some reason, the above line puts the ball about 10px too far right, so adjust
+            game.ball.x -= 10;
+        }
     }
 }
 
