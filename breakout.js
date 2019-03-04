@@ -18,13 +18,13 @@ const CONFIG =
     canvasHeight : 750,
     canvasWidth : "dynamic", // "dynamic" or an integer representing the width in pixels
                         // "dynamic" width is based on the size and spacing of the bricks
-    brickRows : 8,
+    brickRows : 8, // if you change this, change the next two!
+    brickRowValues : [15, 13, 11, 9, 7, 5, 3, 1], // array of score values for each row of bricks, from top to bottom
+    brickRowAccelerations : [50, 50, 0, 50, 0, 50, 0, 0], // tells how much each row will accelerate the ball when hit (px/sec) from top to bottom
     brickColumns : 10,
     brickSpacing : 2,
     brickWidth : 75,
     brickHeight : 25,
-    brickValues : [15, 13, 11, 9, 7, 5, 3, 1], // array of score values for each row of bricks, from top to bottom
-    brickRowAccelerations : [50, 50, 0, 50, 0, 50, 0, 0], // tells how much each row will accelerate the ball when hit (px/sec) from top to bottom
     brickYOffset : 100, // this tells how much space is between the top wall and the bricks
 
     ballRadius : 5,
@@ -100,7 +100,7 @@ class BreakoutGame
 
         this.canvas = document.getElementById(canvasId);
 
-        if (CONFIG.brickValues.length != CONFIG.brickRows)
+        if (CONFIG.brickRowValues.length != CONFIG.brickRows)
         {
             alert("ERROR: number of brick rows does not match number of brick values.");
         }
@@ -148,7 +148,7 @@ class BreakoutGame
             for (let j=0, x=0; j<CONFIG.brickColumns; j++)
             {
                 x += CONFIG.brickSpacing;
-                let newBrick = new Brick(color, x, y, CONFIG.brickWidth, CONFIG.brickHeight, CONFIG.brickValues[i]);
+                let newBrick = new Brick(color, x, y, CONFIG.brickWidth, CONFIG.brickHeight, CONFIG.brickRowValues[i]);
                 this.entities.push(newBrick);
                 this.bricks.push(newBrick);
                 x += CONFIG.brickWidth;
