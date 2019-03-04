@@ -3,7 +3,7 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
-    debug_neverMiss : false, // paddle never misses when true!
+    debug_autopilot : false, // paddle never misses when true!
     startLives : 1,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
@@ -321,7 +321,7 @@ class BreakoutGame
         this.ball.x += xIncrement;
         this.ball.y += yIncrement;
 
-        if (CONFIG.debug_neverMiss)
+        if (CONFIG.debug_autopilot)
         {
             this.paddle.x = this.ball.x - (this.paddle.width/2);
         }
@@ -589,7 +589,7 @@ class Paddle extends Brick
 function mouseMoveHandler(e)
 {
 
-    if (!CONFIG.debug_neverMiss)
+    if (!CONFIG.debug_autopilot)
     {
         // the middle of the paddle follows the mouse pointer
         game.paddle.x = e.clientX - game.paddle.width/2;
