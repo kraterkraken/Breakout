@@ -12,15 +12,12 @@ const CONFIG =
     statusBarHeight : 100, // NOTE:  the top wall of the game "arena" is at y=statusBarHeight
                             // IMPORTANT: changing the statusBarHeight from 100 will have unexpected
                             // results, since the text in there is a fixed font size, and won't scale
-
     statusBarColor : "#555555",
+    font : "Courier New",
 
     canvasHeight : 750,
     canvasWidth : "dynamic", // "dynamic" or an integer representing the width in pixels
                         // "dynamic" width is based on the size and spacing of the bricks
-
-    font : "Courier New",
-
     brickRows : 8,
     brickColumns : 10,
     brickSpacing : 2,
