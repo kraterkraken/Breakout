@@ -29,7 +29,7 @@ const CONFIG =
 
     ballRadius : 5,
     initialBallSpeed : 300, // pixels per second
-    initialBallDirection : -Math.PI / 4, // radians ... zero is due east, angle sweeps counter-clockwise as it increases
+    initialBallDirection : -Math.PI / 4, // radians ... zero is due east, angle sweeps clockwise as it increases
 
     paddleWidth : 60,
     paddleHeight : 10,
