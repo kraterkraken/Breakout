@@ -3,7 +3,7 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
-    debug_autopilot : false, // paddle never misses when true!
+    debug_autopilot : true, // paddle never misses when true!
     startLives : 1,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
@@ -203,7 +203,7 @@ class BreakoutGame
 
             // adjust the position of the ball if a part of the ball is currently clipped by the ceiling
             // (this prevents some really weird rebound bugs where the ball just glides along the surface for a while)
-            this.ball.y = (this.ball.top < 0)? this.ball.radius : this.ball.y;
+            this.ball.y = (this.ball.top < this.statusBar.height)? this.statusBar.height + this.ball.radius : this.ball.y;
         }
         else if (this.ball.bottom >= this.canvas.height)
         {
