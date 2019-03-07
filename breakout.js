@@ -3,8 +3,8 @@
 // initialize GLOBAL config values
 const CONFIG =
 {
-    debug_autopilot : true, // paddle never misses when true!
-    startLives : 1,
+    debug_autopilot : false, // paddle never misses when true!
+    startLives : 3,
     brickColor : "rainbow", // "rainbow" or a valid HTML color.  "rainbow" makes a rainbow of colors
     ballColor : "lightblue",
     paddleColor : "yellow",
