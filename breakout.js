@@ -92,6 +92,10 @@ class BreakoutGame
         // I'm not fond of defining instance variables this way, but this is how you do it (FOR NOW!) :-(
         this.running = false;
         this.isOver = false;
+        this.lastTime=(new Date).getTime();
+        this.newTime=(new Date).getTime();
+        this.bricksLeft = CONFIG.brickRows * CONFIG.brickColumns;
+
         this.wasRowHit = new Array(CONFIG.brickRows);
         for (let i=0; i<this.wasRowHit.length; i++)
         {
@@ -167,6 +171,7 @@ class BreakoutGame
         this.isOver = false;
         this.statusBar.score = 0;
         this.statusBar.livesLeft = CONFIG.startLives;
+        this.bricksLeft = CONFIG.brickRows * CONFIG.brickColumns;
         this.ball.speed = 0;
         this.ball.direction = CONFIG.initialBallDirection;
         this.paddle.width = CONFIG.paddleWidth;
@@ -178,7 +183,11 @@ class BreakoutGame
 
         document.addEventListener("click", mouseClickHandler);
         this.redraw();
+    }
 
+    get elapsedTime()
+    {
+        return this.newTime - this.lastTime;
     }
 
     // ---------------------------------------------------------------------
@@ -276,6 +285,8 @@ class BreakoutGame
                 {
                     this.bricks[i].exists = false;
                     this.statusBar.score += this.bricks[i].value;
+                    this.bricksLeft--;
+
                     // handle ball accelerations
                     let row = Math.floor(i / CONFIG.brickColumns); // what row are we in?
 
@@ -311,8 +322,13 @@ class BreakoutGame
     // ---------------------------------------------------------------------
     moveBall()
     {
-        // make the ball move
-        let s = (this.ball.speed/CONFIG.frameRate);
+        // make the ball move based on the speed
+        // and also on the time elapsed since the last move
+        this.lastTime = this.newTime;
+        this.newTime = (new Date).getTime();
+
+        let s = (this.ball.speed * this.elapsedTime / 1000);
+        //let s = this.ball.speed/CONFIG.frameRate; // this was an attempt to fix stuttering, but it made it worse
         let xIncrement = s * Math.cos(this.ball.direction);
         let yIncrement = s * Math.sin(this.ball.direction);
         this.ball.x += xIncrement;
@@ -325,6 +341,29 @@ class BreakoutGame
 
     }
 
+    // ---------------------------------------------------------------------
+    checkWinner()
+    {
+        if (this.isOver)
+        {
+            return;  // no point doing all this if the game is already over
+        }
+
+        if (this.bricksLeft == 0)
+        {
+            // player wins!
+            this.isOver = true;
+            this.ball.speed = 0;
+            this.ball.x = this.paddle.x + (this.paddle.width/2);
+            this.ball.y = this.paddle.y - this.ball.radius - 1;
+            this.ball.diredction = CONFIG.initialBallDirection;
+            this.running = false;
+            this.redraw();  // we redraw here to make sure the screen is updated
+            this.msgBox2Line("YOU WIN!","Press a key to play again!");
+            document.addEventListener("keypress", keyPressHandler);
+            console.log("weeeeee haaaave aaaaa winnnnerrrrrrrrrr!");
+        }
+    }
     // ---------------------------------------------------------------------
     checkLives()
     {
@@ -649,6 +688,7 @@ function playGame()
     // If it isn't, see if the ball hit anything this frame, then make it move,
     // and draw this frame.
     game.checkLives();
+    game.checkWinner();
     if (!game.isOver)
     {
         game.handleWallCollisions();
@@ -661,4 +701,4 @@ function playGame()
 var game = new BreakoutGame("breakoutCanvas");
 document.addEventListener("click", mouseClickHandler);
 document.addEventListener("mousemove", mouseMoveHandler);
-setInterval(playGame, 1000/CONFIG.frameRate);
+setInterval(playGame, Math.ceil(1000/CONFIG.frameRate));
